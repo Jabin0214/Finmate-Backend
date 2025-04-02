@@ -1,0 +1,56 @@
+# Build results
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VSCode / Rider settings
+.vscode/
+.idea/
+
+# ASP.NET Core secrets
+secrets.json
+
+# Local config
+appsettings.Development.json
+appsettings.Local.json
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# EF Core Migrations Snapshots (optional)
+**/*.Designer.cs
+
+# dotnet tools
+/.tools/
+
+# Test results
+TestResults/
+*.coverage
+*.coveragexml
+
+# Publish output
+publish/
+wwwroot/lib/
+
+# npm / node (if using frontend inside backend)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Rider & JetBrains
+*.sln.iml
+*.dotCover
+
+# Git ignore for environment and credentials
+.env
+*.db
