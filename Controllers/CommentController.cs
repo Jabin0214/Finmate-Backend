@@ -4,13 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.Dtos.Comment;
 using api.Extensions;
+using api.Helpers;
 using api.Interfaces;
 using api.Mappers;
 using api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace api.Controllers
 {
@@ -18,82 +18,121 @@ namespace api.Controllers
     [ApiController]
     public class CommentController : ControllerBase
     {
-        private readonly ICommentRepository _commentRepository;
-        private readonly IStockRepository _stockRepository;
+        private readonly ICommentRepository _commentRepo;
+        private readonly IStockRepository _stockRepo;
         private readonly UserManager<AppUser> _userManager;
-        public CommentController(ICommentRepository commentRepository, IStockRepository stockRepository, UserManager<AppUser> userManager)
-
+        private readonly IFMPService _fmpService;
+        public CommentController(ICommentRepository commentRepo,
+        IStockRepository stockRepo, UserManager<AppUser> userManager,
+        IFMPService fmpService)
         {
-            _commentRepository = commentRepository;
-            _stockRepository = stockRepository;
+            _commentRepo = commentRepo;
+            _stockRepo = stockRepo;
             _userManager = userManager;
-
+            _fmpService = fmpService;
         }
+
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [Authorize]
+        public async Task<IActionResult> GetAll([FromQuery] CommentQueryObject queryObject)
         {
-            var comments = await _commentRepository.GetAllAsync();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            var commentDto = comments.Select(c => c.ToCommentDto());
+            var comments = await _commentRepo.GetAllAsync(queryObject);
 
+            var commentDto = comments.Select(s => ((Comment)s).ToCommentDto());
 
             return Ok(commentDto);
         }
+
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            var comment = await _commentRepository.GetByIdAsync(id);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var comment = await _commentRepo.GetByIdAsync(id);
+
             if (comment == null)
             {
                 return NotFound();
             }
+
             return Ok(comment.ToCommentDto());
         }
 
-        [HttpPost("stock/{stockId}")]
-        public async Task<IActionResult> Create([FromRoute] int stockId, [FromBody] CreateCommentDto commentDto)
+        [HttpPost]
+        [Route("{symbol:alpha}")]
+        public async Task<IActionResult> Create([FromRoute] string symbol, CreateCommentDto commentDto)
         {
-            if(!ModelState.IsValid)
-            {
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            }
-            
-            if (!await _stockRepository.StockExists(stockId))
-            {
-                return BadRequest("Stock not found");
-            }
-            var user = User.GetUserName();
-            var appUser = await _userManager.FindByNameAsync(user);
 
-            var comment = commentDto.ToCommentFromCreateCommentDto(stockId);
-            comment.AppUserId= appUser.Id;
-            await _commentRepository.CreateAsync(comment);
-            return CreatedAtAction(nameof(GetById), new { id = comment.Id }, comment.ToCommentDto());
+            var stock = await _stockRepo.GetBySymbolAsync(symbol);
+
+            if (stock == null)
+            {
+                stock = await _fmpService.FindStockBySymbolAsync(symbol);
+                if (stock == null)
+                {
+                    return BadRequest("Stock does not exists");
+                }
+                else
+                {
+                    await _stockRepo.CreateStockAsync(stock);
+                }
+            }
+
+            var username = User.GetUserName();
+            var appUser = await _userManager.FindByNameAsync(username);
+
+            var commentModel = commentDto.ToCommentFromCreate(stock.Id);
+            commentModel.AppUserId = appUser.Id;
+            await _commentRepo.CreateAsync(commentModel);
+            return CreatedAtAction(nameof(GetById), new { id = commentModel.Id }, commentModel.ToCommentDto());
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentDto commentDto)
+        [HttpPut]
+        [Route("{id:int}")]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentRequestDto updateDto)
         {
-            var comment = await _commentRepository.UpdateAsync(id, commentDto.ToCommentFromUpdateCommentDto());
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var comment = await _commentRepo.UpdateAsync(id, updateDto.ToCommentFromUpdate(id));
+
             if (comment == null)
             {
                 return NotFound("Comment not found");
             }
-            return Ok(comment.ToCommentDto());
 
+            return Ok(comment.ToCommentDto());
         }
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete]
+        [Route("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            var comment = await _commentRepository.GetByIdAsync(id);
-            if (comment == null)
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var commentModel = await _commentRepo.DeleteAsync(id);
+
+            if (commentModel == null)
             {
-                return NotFound("Comment not found");
+                return NotFound("Comment does not exist");
             }
-            await _commentRepository.DeleteAsync(id);
-            return NoContent();
+
+            return Ok(commentModel);
         }
     }
-    
+
+    public class UpdateCommentRequestDto
+    {
+        internal Comment ToCommentFromUpdate(int id)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

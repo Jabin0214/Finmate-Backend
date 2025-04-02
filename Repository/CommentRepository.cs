@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.Data;
+using api.Helpers;
 using api.Interfaces;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +45,11 @@ namespace api.Repository
         public async Task<List<Comment>> GetAllAsync()
         {
             return await _context.Comment.Include(a=> a.AppUser).ToListAsync();
+        }
+
+        public Task<IEnumerable<object>> GetAllAsync(CommentQueryObject queryObject)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<Comment?> GetByIdAsync(int id)

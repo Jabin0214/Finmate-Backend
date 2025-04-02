@@ -107,5 +107,7 @@ namespace api.Repository
         {
             return await _ApplicationDBContext.Stock.FirstOrDefaultAsync(s => s.Symbol == symbol);
         }
+
+        
     }
 }

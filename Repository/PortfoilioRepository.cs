@@ -17,13 +17,6 @@ namespace api.Repository
             _context = context;
         }
 
-        public async Task<Portfolio> AddToPortfolio(Portfolio portfolio)
-        {
-            await _context.Portfolio.AddAsync(portfolio);
-            await _context.SaveChangesAsync();
-            return portfolio;
-        }
-
         public async Task<Portfolio> CreateAsync(Portfolio portfolio)
         {
             await _context.Portfolio.AddAsync(portfolio);
