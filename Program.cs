@@ -96,6 +96,8 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
 builder.Services.AddScoped<IFMPService, FMPService>();
 builder.Services.AddHttpClient<IFMPService, FMPService>();
+builder.Services.AddScoped<INewsService, NewsService>();
+builder.Services.AddHttpClient<INewsService, NewsService>();
 
 builder.Services.AddCors(options =>
 {

@@ -8,6 +8,7 @@ using api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using api.Service;
 
 namespace api.Controllers
 {
@@ -19,14 +20,16 @@ namespace api.Controllers
         private readonly IStockRepository _stockRepo;
         private readonly IPortfolioRepository _portfolioRepo;
         private readonly IFMPService _fmpService;
+        private readonly INewsService _newsService;
         public PortfolioController(UserManager<AppUser> userManager,
         IStockRepository stockRepo, IPortfolioRepository portfolioRepo,
-        IFMPService fmpService)
+        IFMPService fmpService, INewsService newsService)
         {
             _userManager = userManager;
             _stockRepo = stockRepo;
             _portfolioRepo = portfolioRepo;
             _fmpService = fmpService;
+            _newsService = newsService;
         }
 
         [HttpGet]
@@ -37,6 +40,25 @@ namespace api.Controllers
             var appUser = await _userManager.FindByNameAsync(username);
             var userPortfolio = await _portfolioRepo.GetUserPortfolio(appUser);
             return Ok(userPortfolio);
+        }
+
+
+        [HttpGet("news")]
+        public async Task<IActionResult> GetPortfolioNews()
+        {
+            var username = User.GetUserName();
+            var appUser = await _userManager.FindByNameAsync(username);
+            var userPortfolio = await _portfolioRepo.GetUserPortfolio(appUser);
+
+            var companyNames = userPortfolio
+                .Select(stock => stock.CompanyName)
+                .Where(name => !string.IsNullOrEmpty(name))
+                .Distinct()
+                .ToList();
+
+            var newsResults = await _newsService.GetNewsForCompaniesAsync(companyNames);
+
+            return Ok(newsResults);
         }
 
         [HttpPost]
