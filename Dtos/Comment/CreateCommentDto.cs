@@ -15,10 +15,5 @@ namespace api.Dtos.Comment
         public string Title { get; set; } = string.Empty;
 
         public string Content { get; set; } = string.Empty;
-
-        internal Models.Comment ToCommentFromCreate(int id)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

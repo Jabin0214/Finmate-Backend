@@ -100,29 +100,32 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins(builder.Configuration["FrontendURL"] ?? "https://yourfrontend.azurewebsites.net")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+        policy
+            .WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
-builder.WebHost.UseUrls("http://0.0.0.0:80");
-
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    var port = Environment.GetEnvironmentVariable("PORT") ?? "80";
+    serverOptions.ListenAnyIP(Int32.Parse(port));
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
-app.UseSwagger();
-app.UseSwaggerUI();
-
-app.UseCors("AllowFrontend");
-
-
 app.UseHttpsRedirection();
 
+// ✅ 必须在认证之前配置 CORS
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapControllers();
 

@@ -12,5 +12,4 @@
     
     EXPOSE 80
     
-    # 👇 保证 dotnet 命令有效
     ENTRYPOINT ["dotnet", "api.dll"]
