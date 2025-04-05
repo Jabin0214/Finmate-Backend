@@ -54,3 +54,4 @@ yarn-error.log
 # Git ignore for environment and credentials
 .env
 *.db
+.fake
