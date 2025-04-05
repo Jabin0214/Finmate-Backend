@@ -21,15 +21,17 @@ namespace api.Controllers
         private readonly IPortfolioRepository _portfolioRepo;
         private readonly IFMPService _fmpService;
         private readonly INewsService _newsService;
+        private readonly IAIService _aiService;
         public PortfolioController(UserManager<AppUser> userManager,
         IStockRepository stockRepo, IPortfolioRepository portfolioRepo,
-        IFMPService fmpService, INewsService newsService)
+        IFMPService fmpService, INewsService newsService, IAIService aiService)
         {
-            _userManager = userManager;
-            _stockRepo = stockRepo;
-            _portfolioRepo = portfolioRepo;
+            _aiService = aiService;
             _fmpService = fmpService;
             _newsService = newsService;
+            _stockRepo = stockRepo;
+            _portfolioRepo = portfolioRepo;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -44,6 +46,7 @@ namespace api.Controllers
 
 
         [HttpGet("news")]
+        [Authorize]
         public async Task<IActionResult> GetPortfolioNews()
         {
             var username = User.GetUserName();
@@ -57,8 +60,9 @@ namespace api.Controllers
                 .ToList();
 
             var newsResults = await _newsService.GetNewsForCompaniesAsync(companyNames);
+            var aiResult = await _aiService.GeneratePodcastAsync(newsResults);
 
-            return Ok(newsResults);
+            return Ok(aiResult);
         }
 
         [HttpPost]

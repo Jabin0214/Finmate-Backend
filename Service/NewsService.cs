@@ -30,7 +30,7 @@ namespace api.Service
             {
                 var keyword = SearchHelper.ExtractSearchKeyword(name);
 
-                var url = $"https://newsapi.org/v2/everything?q={Uri.EscapeDataString(keyword)}&from={date}&sortBy=popularity&apiKey={apiKey}";
+                var url = $"https://newsapi.org/v2/top-headlines?q={Uri.EscapeDataString(keyword)}&from={date}&sortBy=popularity&apiKey={apiKey}";
 
                 try
                 {
@@ -82,6 +82,57 @@ namespace api.Service
                     Console.WriteLine($"[Error] {name}: {ex.Message}");
                     continue;
                 }
+            }
+
+            var url_busi = $"https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey={apiKey}";
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, url_busi);
+                request.Headers.Add("User-Agent", "Mozilla/5.0");
+
+                var response = await _httpClient.SendAsync(request);
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"[❌] HTTP {response.StatusCode} - {url_busi}");
+                    return newsResults;
+                }
+
+                var json = await response.Content.ReadAsStringAsync();
+                dynamic newsObj = JsonConvert.DeserializeObject<dynamic>(json);
+
+                var articles = newsObj?.articles;
+                if (articles == null) return newsResults;
+
+                var topArticles = new List<object>();
+                int count = 0;
+
+                foreach (var article in articles)
+                {
+                    if (count++ >= 5) break;
+
+                    string title = article.title;
+                    string urlArticle = article.url;
+                    string description = article.description;
+                    string content = article.content;
+
+                    topArticles.Add(new
+                    {
+                        Title = title?.ToString(),
+                        Url = urlArticle?.ToString(),
+                        Description = description?.ToString(),
+                        Content = content?.ToString()
+                    });
+                }
+
+                newsResults.Add(new
+                {
+                    Company = "Business",
+                    News = topArticles
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Error] Business: {ex.Message}");
             }
 
             return newsResults;

@@ -98,6 +98,9 @@ builder.Services.AddScoped<IFMPService, FMPService>();
 builder.Services.AddHttpClient<IFMPService, FMPService>();
 builder.Services.AddScoped<INewsService, NewsService>();
 builder.Services.AddHttpClient<INewsService, NewsService>();
+builder.Services.AddScoped<IAIService, AIService>();
+builder.Services.AddHttpClient<IAIService, AIService>();
+
 
 builder.Services.AddCors(options =>
 {
