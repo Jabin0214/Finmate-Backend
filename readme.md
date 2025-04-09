@@ -1,6 +1,12 @@
-# Stock Portfolio Management Backend API
+# Finmate Backend API
 
-This is the backend API for a Stock Portfolio Management application. It provides functionalities for managing user accounts, portfolios, stocks, and comments.
+This is the backend API for a Finmate. It provides functionalities for managing user accounts, portfolios, stocks, and comments.
+
+[Frontend Code](https://github.com/Jabin0214/finmata-frontend)
+
+[Web Preview](https://finmate-frontend-dyekdshzd2apetf4.newzealandnorth-01.azurewebsites.net/)
+
+
 
 ## Table of Contents
 
