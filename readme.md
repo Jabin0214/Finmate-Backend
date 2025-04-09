@@ -15,7 +15,6 @@ This is the backend API for a Stock Portfolio Management application. It provide
 * [API Endpoints](#api-endpoints)
 * [Database](#database)
 * [Docker](#docker)
-* [Project Structure](#project-structure)
 * [API Testing](#api-testing)
 * [Deployment](#deployment)
 * [Contributing](#contributing)
