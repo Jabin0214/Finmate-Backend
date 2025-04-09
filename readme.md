@@ -29,7 +29,7 @@ This is the backend API for a Stock Portfolio Management application. It provide
 * **ASP.NET Core Identity:** For managing user authentication and authorization.
 * **Newtonsoft.Json:** For JSON serialization and deserialization.
 * **Swashbuckle/OpenAPI:** For generating API documentation (Swagger UI).
-* **Potentially other libraries:** (e.g., for JWT authentication, logging, etc.)
+* **Other libraries:** (e.g., for JWT authentication, logging, etc.)
 
 ## Prerequisites
 
