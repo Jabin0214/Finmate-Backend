@@ -27,9 +27,8 @@ namespace api.Service
             var apiUrl = "https://api.deepseek.com/v1/chat/completions";
 
             var promptBuilder = new StringBuilder();
-            promptBuilder.AppendLine("你是一位专业的播客文稿撰写人，我会提供一些关于公司股票、财经新闻和国际事件的信息，请你整合这些内容，生成一段适合直接转语音使用的播客文稿。文稿需要使用第一人称口吻，语言自然、亲切、有节奏感，像是主播在和听众聊天一样。请避免使用任何标题、符号或格式标注，只输出完整的一段话，适合直接作为语音播报使用。语言要口语化，句子简洁，不使用复杂结构，适当加入背景解释、情绪反应或个人看法，让内容更生动易懂。无需直接引用新闻原文或数据，用你自己的话进行转述和分析，控制整体篇幅在两到三分钟的口播时长内（约300–500字）。\n");
+            promptBuilder.AppendLine("You are a professional podcast script writer. I will provide you with some information about company stocks, financial news, and international events. Your task is to integrate this information and generate a script suitable for direct voice recording. The script should be written in the first person, using a natural, friendly, and rhythmic tone, as if the host is casually chatting with the audience. Please avoid using any titles, symbols, or formatting marks, and only output a complete paragraph that is ready for voice narration. The language should be conversational, with short, simple sentences and no complex structures. Feel free to add background explanations, emotional reactions, or personal opinions to make the content more lively and engaging. Do not directly quote news articles or data; instead, paraphrase and analyze the information in your own words. Keep the total length suitable for a two to three-minute podcast (around 300–500 words).\n");
 
-            // 直接将 newsResults 转换为 JSON 字符串
             string newsJson = JsonConvert.SerializeObject(newsResults);
             promptBuilder.AppendLine(newsJson);
 
