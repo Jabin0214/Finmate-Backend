@@ -197,5 +197,3 @@ Contributions to this project are welcome. Please follow these steps:
 5.  Submit a pull request.
 
 ## License
-
-[Specify the license under which the project is distributed. If no license is specified, the default copyright laws apply.]
